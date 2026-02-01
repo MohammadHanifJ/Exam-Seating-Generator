@@ -1,0 +1,35 @@
+# Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+.cache/
+.parcel-cache/
+.vite/
+.env
+client/.env
+server/.env
+
+# Logs
+logs/
+*.log
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Android / Gradle
+exam-seating-mobile/**/build/
+exam-seating-mobile/.gradle/
+exam-seating-mobile/local.properties
+exam-seating-mobile/*.iml
+exam-seating-mobile/.idea/
+exam-seating-mobile/.env
+
+# Coverage
+coverage/
