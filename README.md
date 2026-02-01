@@ -115,16 +115,6 @@ Update `VITE_API_URL` with the deployed backend URL.
 ## 10) Author / College Project Note
 This is a college project intended for academic and demonstration use. Customize for production environments as needed.
 
-## Git Hygiene Fix (if already tracked)
-If `node_modules/` or `.env` were already committed, run:
-```
-git rm -r --cached node_modules
-git rm --cached .env
-git rm --cached client/.env
-git rm --cached server/.env
-git rm --cached exam-seating-mobile/.env
-git commit -m "Remove tracked env files and node_modules"
-```
 
 ## Sample Data
 CSV samples in repo root:
