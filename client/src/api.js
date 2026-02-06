@@ -28,7 +28,8 @@ export async function uploadStudents(file) {
 }
 
 export async function getBranches(year) {
-  return request(`/branches?year=${encodeURIComponent(year)}`);
+  const suffix = year ? `?year=${encodeURIComponent(year)}` : "";
+  return request(`/branches${suffix}`);
 }
 
 export async function getClassrooms() {

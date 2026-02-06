@@ -138,8 +138,8 @@ export default function UploadStudents() {
     <section className="glass rounded-3xl p-8 md:p-10 card-ring">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-display font-semibold text-slate-900">Upload & Review Students</h2>
-          <p className="text-slate-600">Upload CSV/Excel and approve or block students before seating generation.</p>
+          <h2 className="text-lg font-display font-semibold text-slate-900">Upload & Review Students</h2>
+          <p className="text-slate-600 text-xs">Upload CSV/Excel and approve or block students before seating generation.</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -147,7 +147,7 @@ export default function UploadStudents() {
             <button
               key={item}
               onClick={() => setTab(item)}
-              className={`rounded-full px-4 py-2 text-xs font-semibold border ${
+              className={`rounded-full px-4 py-2 text-[11px] font-semibold border ${
                 tab === item ? "bg-orange-600 text-white border-orange-600" : "border-orange-200 text-orange-700"
               }`}
             >
@@ -159,20 +159,20 @@ export default function UploadStudents() {
         {tab === "Upload" && (
           <div className="rounded-2xl border border-orange-100 bg-white/80 p-6">
             <div className="max-w-2xl">
-              <h3 className="text-lg font-semibold text-slate-900">Upload Student Data</h3>
-              <p className="text-slate-600 mt-2">Duplicate roll numbers are ignored.</p>
+              <h3 className="text-sm font-semibold text-slate-900">Upload Student Data</h3>
+              <p className="text-slate-600 mt-2 text-xs">Duplicate roll numbers are ignored.</p>
             </div>
             <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
               <input
                 type="file"
                 accept=".csv,.xlsx"
                 onChange={(e) => setFile(e.target.files[0])}
-                className="block w-full rounded-xl border border-orange-200 bg-white/90 px-4 py-3 text-sm text-slate-700"
+                className="block w-full rounded-xl border border-orange-200 bg-white/90 px-4 py-3 text-xs text-slate-700"
               />
               <button
                 type="submit"
                 disabled={!file || loading}
-                className="rounded-xl bg-orange-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-600/20 disabled:opacity-50"
+                className="rounded-xl bg-orange-600 px-6 py-3 text-xs font-semibold text-white shadow-lg shadow-orange-600/20 disabled:opacity-50"
               >
                 {loading ? "Uploading..." : "Upload"}
               </button>
@@ -185,8 +185,8 @@ export default function UploadStudents() {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900">Review & Approve</h3>
-                  <p className="text-slate-600 mt-1 text-sm">Approve students to include them in seating.</p>
+                  <h3 className="text-sm font-semibold text-slate-900">Review & Approve</h3>
+                  <p className="text-slate-600 mt-1 text-xs">Approve students to include them in seating.</p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="rounded-full border border-orange-200 px-3 py-1 text-orange-700">
@@ -238,7 +238,7 @@ export default function UploadStudents() {
                 <select
                   value={branch}
                   onChange={(e) => setBranch(e.target.value)}
-                  className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                  className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 >
                   <option value="">All Branches</option>
                   {branches.map((b) => (
@@ -250,7 +250,7 @@ export default function UploadStudents() {
                 <select
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
-                  className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                  className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 >
                   <option value="">All Years</option>
                   {["1", "2", "3", "4"].map((y) => (
@@ -259,20 +259,20 @@ export default function UploadStudents() {
                     </option>
                   ))}
                 </select>
-                <div className="rounded-xl border border-orange-100 bg-white/80 px-4 py-2 text-sm text-slate-600">
+                <div className="rounded-xl border border-orange-100 bg-white/80 px-4 py-2 text-xs text-slate-600">
                   Status: {filter}
                 </div>
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by name, roll no, or branch"
-                  className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                  className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 />
               </div>
 
               {status && (
                 <div
-                  className={`rounded-2xl px-4 py-3 text-sm ${
+                  className={`rounded-2xl px-4 py-3 text-xs ${
                     status.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"
                   }`}
                 >
@@ -280,7 +280,7 @@ export default function UploadStudents() {
                 </div>
               )}
 
-              <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
+            <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
                 <div className="overflow-auto">
                   <table className="min-w-full text-sm">
                     <thead>
@@ -344,7 +344,7 @@ export default function UploadStudents() {
 
         {status && tab === "Upload" && (
           <div
-            className={`rounded-2xl px-4 py-3 text-sm ${
+            className={`rounded-2xl px-4 py-3 text-xs ${
               status.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"
             }`}
           >
@@ -355,3 +355,5 @@ export default function UploadStudents() {
     </section>
   );
 }
+
+

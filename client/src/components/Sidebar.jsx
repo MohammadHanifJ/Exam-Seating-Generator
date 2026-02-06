@@ -19,7 +19,7 @@ export default function Sidebar({ open, onClose, onLogout }) {
       >
         <div className="flex h-full flex-col">
           <div className="px-6 py-6">
-            <h2 className="text-lg font-display font-semibold text-slate-900">Admin Dashboard</h2>
+            <h2 className="text-sm font-display font-semibold text-slate-900">Admin Dashboard</h2>
             <p className="text-xs text-slate-500">SRIT Examination Portal</p>
           </div>
           <nav className="flex-1 overflow-y-auto px-3 pb-6">
@@ -29,7 +29,7 @@ export default function Sidebar({ open, onClose, onLogout }) {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `rounded-xl px-4 py-3 text-sm font-semibold ${
+                    `rounded-xl px-4 py-3 text-xs font-semibold ${
                       isActive ? "bg-orange-100 text-orange-800" : "text-slate-700 hover:bg-orange-50"
                     }`
                   }
@@ -41,7 +41,7 @@ export default function Sidebar({ open, onClose, onLogout }) {
             <button
               type="button"
               onClick={onLogout}
-              className="mt-6 w-full rounded-xl border border-orange-200 px-4 py-3 text-sm font-semibold text-orange-700 hover:bg-orange-50"
+              className="mt-6 w-full rounded-xl border border-orange-200 px-4 py-3 text-xs font-semibold text-orange-700 hover:bg-orange-50"
             >
               Logout
             </button>
@@ -51,3 +51,4 @@ export default function Sidebar({ open, onClose, onLogout }) {
     </>
   );
 }
+

@@ -57,8 +57,8 @@ export default function Timetable() {
     <section className="glass rounded-3xl p-8 md:p-10 card-ring">
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="text-2xl font-display font-semibold text-slate-900">Timetable Management</h2>
-          <p className="text-slate-600 mt-2">Create and manage department-wise exam schedules.</p>
+          <h2 className="text-lg font-display font-semibold text-slate-900">Timetable Management</h2>
+          <p className="text-slate-600 mt-2 text-xs">Create and manage department-wise exam schedules.</p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -67,7 +67,7 @@ export default function Timetable() {
             <select
               value={filters.department}
               onChange={(e) => setFilters({ ...filters, department: e.target.value })}
-              className="mt-3 w-full rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+              className="mt-3 w-full rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
             >
               <option value="">All Departments</option>
               {branches.map((branch) => (
@@ -79,7 +79,7 @@ export default function Timetable() {
             <select
               value={filters.year}
               onChange={(e) => setFilters({ ...filters, year: e.target.value })}
-              className="mt-3 w-full rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+              className="mt-3 w-full rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
             >
               {["1", "2", "3", "4"].map((y) => (
                 <option key={y} value={y}>
@@ -110,7 +110,7 @@ export default function Timetable() {
               <select
                 value={form.department}
                 onChange={(e) => setForm({ ...form, department: e.target.value })}
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 required
               >
                 <option value="">Department</option>
@@ -123,7 +123,7 @@ export default function Timetable() {
               <select
                 value={form.year}
                 onChange={(e) => setForm({ ...form, year: e.target.value })}
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 required
               >
                 {["1", "2", "3", "4"].map((y) => (
@@ -135,7 +135,7 @@ export default function Timetable() {
               <select
                 value={form.exam_type}
                 onChange={(e) => setForm({ ...form, exam_type: e.target.value })}
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
               >
                 {examTypes.map((type) => (
                   <option key={type} value={type}>
@@ -147,33 +147,33 @@ export default function Timetable() {
                 value={form.subject_name}
                 onChange={(e) => setForm({ ...form, subject_name: e.target.value })}
                 placeholder="Subject"
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm md:col-span-2"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs md:col-span-2"
                 required
               />
               <input
                 type="date"
                 value={form.exam_date}
                 onChange={(e) => setForm({ ...form, exam_date: e.target.value })}
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 required
               />
               <input
                 type="time"
                 value={form.start_time}
                 onChange={(e) => setForm({ ...form, start_time: e.target.value })}
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 required
               />
               <input
                 type="time"
                 value={form.end_time}
                 onChange={(e) => setForm({ ...form, end_time: e.target.value })}
-                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+                className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
                 required
               />
               <button
                 type="submit"
-                className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-xl bg-orange-600 px-4 py-2 text-xs font-semibold text-white"
               >
                 Save Entry
               </button>
@@ -183,7 +183,7 @@ export default function Timetable() {
 
         {status && (
           <div
-            className={`rounded-2xl px-4 py-3 text-sm ${
+            className={`rounded-2xl px-4 py-3 text-xs ${
               status.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"
             }`}
           >
@@ -242,3 +242,5 @@ export default function Timetable() {
     </section>
   );
 }
+
+

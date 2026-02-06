@@ -86,10 +86,10 @@ export default function ReviewStudents() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-display font-semibold text-slate-900">Review Students</h2>
-            <p className="text-slate-600 mt-2">Approve or block students before seating generation.</p>
+            <h2 className="text-lg font-display font-semibold text-slate-900">Review Students</h2>
+            <p className="text-slate-600 mt-2 text-xs">Approve or block students before seating generation.</p>
           </div>
-          <div className="flex flex-wrap gap-2 text-xs">
+          <div className="flex flex-wrap gap-2 text-[11px]">
             <span className="rounded-full border border-orange-200 px-3 py-1 text-orange-700">
               Total: {counts.total}
             </span>
@@ -110,7 +110,7 @@ export default function ReviewStudents() {
             <button
               key={item}
               onClick={() => setFilter(item)}
-              className={`rounded-full px-4 py-2 text-xs font-semibold border ${
+            className={`rounded-full px-4 py-2 text-[11px] font-semibold border ${
                 filter === item
                   ? "bg-orange-600 text-white border-orange-600"
                   : "border-orange-200 text-orange-700"
@@ -133,7 +133,7 @@ export default function ReviewStudents() {
                 setStatus({ type: "error", message: err.message });
               }
             }}
-            className="rounded-full px-4 py-2 text-xs font-semibold border border-emerald-200 text-emerald-700"
+            className="rounded-full px-4 py-2 text-[11px] font-semibold border border-emerald-200 text-emerald-700"
           >
             Approve All
           </button>
@@ -143,7 +143,7 @@ export default function ReviewStudents() {
           <select
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
-            className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+            className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
           >
             <option value="">All Branches</option>
             {branches.map((b) => (
@@ -155,7 +155,7 @@ export default function ReviewStudents() {
           <select
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+            className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
           >
             <option value="">All Years</option>
             {["1", "2", "3", "4"].map((y) => (
@@ -164,19 +164,19 @@ export default function ReviewStudents() {
               </option>
             ))}
           </select>
-          <div className="rounded-xl border border-orange-100 bg-white/80 px-4 py-2 text-sm text-slate-600">
+          <div className="rounded-xl border border-orange-100 bg-white/80 px-4 py-2 text-xs text-slate-600">
             Status: {filter}
           </div>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, roll no, or branch"
-            className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+            className="rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
           />
         </div>
 
         {status && (
-          <div className="rounded-2xl px-4 py-3 text-sm bg-orange-50 text-orange-700">{status.message}</div>
+          <div className="rounded-2xl px-4 py-3 text-xs bg-orange-50 text-orange-700">{status.message}</div>
         )}
 
         <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
@@ -241,3 +241,5 @@ export default function ReviewStudents() {
     </section>
   );
 }
+
+

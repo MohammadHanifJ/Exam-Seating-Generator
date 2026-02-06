@@ -1,7 +1,15 @@
 import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { buildSeatLabels } from "./seating.js";
 
-const ROW_HEIGHT = 22;
+const ROW_HEIGHT = 24;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const HEADER_IMAGE_PATH = path.resolve(__dirname, "assets", "pdf_header.png");
+const HEADER_IMAGE_HEIGHT = 70;
+const HEADER_GAP = 14;
 const COLS_SEMESTER = [
   { label: "Seat", width: 50 },
   { label: "Name", width: 180 },
@@ -21,10 +29,15 @@ const COLS_MID = [
 
 function drawTableHeader(doc, y, columns) {
   let x = doc.page.margins.left;
-  doc.fontSize(9).fillColor("#0f172a");
+  doc.fontSize(10).fillColor("#0b0f1a");
   columns.forEach((col) => {
-    doc.rect(x, y, col.width, ROW_HEIGHT).strokeColor("#94a3b8").stroke();
-    doc.text(col.label, x + 4, y + 6, { width: col.width - 8, align: "left" });
+    doc
+      .rect(x, y, col.width, ROW_HEIGHT)
+      .fillAndStroke("#ffffff", "#0f172a");
+    doc
+      .font("Helvetica-Bold")
+      .fillColor("#0b0f1a")
+      .text(col.label, x + 4, y + 6, { width: col.width - 8, align: "left" });
     x += col.width;
   });
   return y + ROW_HEIGHT;
@@ -32,19 +45,21 @@ function drawTableHeader(doc, y, columns) {
 
 function drawTableRow(doc, y, columns, values) {
   let x = doc.page.margins.left;
+  doc.font("Helvetica").fillColor("#0f172a");
   columns.forEach((col, idx) => {
-    doc.rect(x, y, col.width, ROW_HEIGHT).strokeColor("#e2e8f0").stroke();
+    doc.rect(x, y, col.width, ROW_HEIGHT).strokeColor("#0f172a").lineWidth(0.5).stroke();
     doc.text(values[idx], x + 4, y + 6, { width: col.width - 8, align: "left" });
     x += col.width;
   });
   return y + ROW_HEIGHT;
 }
 
-function ensureSpace(doc, y, columns) {
+function ensureSpace(doc, y, columns, renderHeader) {
   const bottom = doc.page.height - doc.page.margins.bottom;
   if (y + ROW_HEIGHT > bottom) {
     doc.addPage();
-    return drawTableHeader(doc, doc.page.margins.top, columns);
+    const headerY = renderHeader();
+    return drawTableHeader(doc, headerY, columns);
   }
   return y;
 }
@@ -83,20 +98,40 @@ function buildMidRows(seats, capacity = 30) {
   });
 }
 
-function renderMeta(doc, { examType, roomNo, invigilators }) {
-  doc.fontSize(16).fillColor("#0f172a").text("Srinivasa Ramanujan Institute of Technology", {
+function renderHeader(doc) {
+  if (fs.existsSync(HEADER_IMAGE_PATH)) {
+    const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+    doc.image(HEADER_IMAGE_PATH, doc.page.margins.left, doc.page.margins.top, {
+      fit: [pageWidth, HEADER_IMAGE_HEIGHT],
+      align: "center"
+    });
+    return doc.page.margins.top + HEADER_IMAGE_HEIGHT + HEADER_GAP;
+  }
+  return doc.page.margins.top;
+}
+
+function renderMeta(doc, { examType, roomNo, invigilators }, startY) {
+  doc.y = startY;
+  doc.font("Helvetica-Bold").fontSize(14).fillColor("#0f172a").text("Srinivasa Ramanujan Institute of Technology", {
     align: "center"
   });
-  doc.fontSize(12).text("Examination Seating Arrangement", { align: "center" });
+  doc.font("Helvetica").fontSize(10).text("AUTONOMOUS", { align: "center" });
+  doc.font("Helvetica-Bold").fontSize(11).text("SEATING PLAN", { align: "center" });
+  doc.moveDown(0.3);
+  doc
+    .lineWidth(1)
+    .moveTo(doc.page.margins.left, doc.y)
+    .lineTo(doc.page.width - doc.page.margins.right, doc.y)
+    .stroke("#0f172a");
   doc.moveDown(0.4);
-  doc.fontSize(10).fillColor("#0f172a");
+  doc.font("Helvetica-Bold").fontSize(10).fillColor("#0f172a");
   doc.text(`Exam Type: ${examType}`);
-  doc.text(`Room: ${roomNo}`);
+  doc.text(`Room No: ${roomNo}`);
   if (invigilators?.length) {
     const list = invigilators
       .map((inv) => `${inv.name}${inv.designation ? ` (${inv.designation})` : ""} - ${inv.department}`)
       .join("; ");
-    doc.text(`Invigilator(s): ${list}`);
+    doc.font("Helvetica").text(`Invigilator(s): ${list}`);
   }
   doc.moveDown(0.6);
 }
@@ -104,12 +139,17 @@ function renderMeta(doc, { examType, roomNo, invigilators }) {
 function renderRoom(doc, payload) {
   const { examType, seats, capacity } = payload;
   const columns = examType === "MID" ? COLS_MID : COLS_SEMESTER;
-  renderMeta(doc, payload);
+  const headerStart = renderHeader(doc);
+  renderMeta(doc, payload, headerStart);
   let y = drawTableHeader(doc, doc.y, columns);
   doc.fontSize(9).fillColor("#0f172a");
   const rows = examType === "MID" ? buildMidRows(seats, capacity) : buildSemesterRows(seats, capacity);
   rows.forEach((row) => {
-    y = ensureSpace(doc, y, columns);
+    y = ensureSpace(doc, y, columns, () => {
+      const headerY = renderHeader(doc);
+      renderMeta(doc, payload, headerY);
+      return doc.y;
+    });
     y = drawTableRow(doc, y, columns, row);
   });
 }

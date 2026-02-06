@@ -92,13 +92,13 @@ export default function Preview() {
     <section className="glass rounded-3xl p-8 md:p-10 card-ring">
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="text-2xl font-display font-semibold text-slate-900">Seating Preview</h2>
-          <p className="text-slate-600 mt-2">View seating grid and export PDFs.</p>
+          <h2 className="text-lg font-display font-semibold text-slate-900">Seating Preview</h2>
+          <p className="text-slate-600 mt-2 text-xs">View seating grid and export PDFs.</p>
         </div>
 
-        <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-white/80 px-4 py-3 text-sm text-slate-600">
+        <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-white/80 px-4 py-3 text-xs text-slate-600">
           <span>Batch loaded from generation flow.</span>
-          <button onClick={load} className="rounded-full bg-orange-600 px-4 py-2 text-xs font-semibold text-white">
+          <button onClick={load} className="rounded-full bg-orange-600 px-4 py-2 text-[11px] font-semibold text-white">
             Refresh
           </button>
         </div>
@@ -106,20 +106,20 @@ export default function Preview() {
         {summary && (
           <div className="grid gap-3 lg:grid-cols-4">
             <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
-              <p className="text-xs text-slate-500">Total Seats</p>
-              <p className="text-xl font-semibold text-slate-900">{summary.totalSeats ?? "-"}</p>
+              <p className="text-[11px] text-slate-500">Total Seats</p>
+              <p className="text-base font-semibold text-slate-900">{summary.totalSeats ?? "-"}</p>
             </div>
             <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
-              <p className="text-xs text-slate-500">Seats Filled</p>
-              <p className="text-xl font-semibold text-slate-900">{summary.seatsFilled ?? "-"}</p>
+              <p className="text-[11px] text-slate-500">Seats Filled</p>
+              <p className="text-base font-semibold text-slate-900">{summary.seatsFilled ?? "-"}</p>
             </div>
             <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
-              <p className="text-xs text-slate-500">Empty Seats</p>
-              <p className="text-xl font-semibold text-slate-900">{summary.emptySeats ?? "-"}</p>
+              <p className="text-[11px] text-slate-500">Empty Seats</p>
+              <p className="text-base font-semibold text-slate-900">{summary.emptySeats ?? "-"}</p>
             </div>
             <div className="rounded-2xl border border-orange-100 bg-white/80 p-4">
-              <p className="text-xs text-slate-500">Students Unassigned</p>
-              <p className="text-xl font-semibold text-slate-900">{summary.unassigned ?? "-"}</p>
+              <p className="text-[11px] text-slate-500">Students Unassigned</p>
+              <p className="text-base font-semibold text-slate-900">{summary.unassigned ?? "-"}</p>
             </div>
           </div>
         )}
@@ -129,16 +129,16 @@ export default function Preview() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Emails (comma-separated)"
-            className="flex-1 rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-sm"
+            className="flex-1 rounded-xl border border-orange-200 bg-white/90 px-4 py-2 text-xs"
           />
-          <button onClick={onSend} className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white">
+          <button onClick={onSend} className="rounded-xl bg-orange-500 px-4 py-2 text-xs font-semibold text-white">
             Send PDF
           </button>
         </div>
 
         {status && (
           <div
-            className={`rounded-2xl px-4 py-3 text-sm ${
+            className={`rounded-2xl px-4 py-3 text-xs ${
               status.type === "success" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"
             }`}
           >
@@ -146,7 +146,7 @@ export default function Preview() {
           </div>
         )}
 
-        {rooms.length === 0 && <p className="text-slate-500 text-sm">No seating data loaded.</p>}
+        {rooms.length === 0 && <p className="text-slate-500 text-xs">No seating data loaded.</p>}
 
         {rooms.length > 0 && (
           <div className="flex justify-end">
@@ -154,23 +154,23 @@ export default function Preview() {
               href={pdfUrl(batchId)}
               target="_blank"
               rel="noreferrer"
-              className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white"
-            >
-              Open Combined PDF
-            </a>
-          </div>
-        )}
+            className="rounded-xl bg-orange-600 px-4 py-2 text-xs font-semibold text-white"
+          >
+            Open Combined PDF
+          </a>
+        </div>
+      )}
 
         {rooms.map((room) => (
           <div key={room.room_no} className="rounded-2xl border border-orange-100 bg-white/70 p-6">
             <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Room {room.room_no}</h3>
-                <p className="text-xs text-slate-500">
+                <h3 className="text-sm font-semibold text-slate-900">Room {room.room_no}</h3>
+                <p className="text-[11px] text-slate-500">
                   {room.exam_type} exam | Year {room.year}
                 </p>
                 {room.invigilators?.length > 0 && (
-                  <p className="text-xs text-slate-500">
+                  <p className="text-[11px] text-slate-500">
                     Invigilators:{" "}
                     {room.invigilators.map((inv) => `${inv.name}${inv.designation ? ` (${inv.designation})` : ""}`).join(", ")}
                   </p>
@@ -180,7 +180,7 @@ export default function Preview() {
                 href={pdfUrl(batchId, room.room_no)}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-xl border border-orange-300 px-4 py-2 text-sm text-orange-700"
+                className="rounded-xl border border-orange-300 px-4 py-2 text-xs text-orange-700"
               >
                 Open Room PDF
               </a>
@@ -189,7 +189,7 @@ export default function Preview() {
               <SeatGrid seats={room.seats} examType={room.exam_type} />
             </div>
             <div className="mt-6 overflow-auto">
-              <table className="min-w-full text-xs">
+              <table className="min-w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-[0.2em] text-slate-500">
                     {room.exam_type === "MID" ? (
@@ -255,3 +255,5 @@ export default function Preview() {
     </section>
   );
 }
+
+

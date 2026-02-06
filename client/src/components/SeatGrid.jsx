@@ -61,19 +61,19 @@ export default function SeatGrid({ seats, examType }) {
               hasStudent ? getColor(branch) : "border-orange-100 text-orange-300 bg-white/80"
             )}
           >
-            <p className="text-[10px] uppercase tracking-[0.35em] text-slate-400">{label}</p>
+              <p className="text-[9px] uppercase tracking-[0.35em] text-slate-400">{label}</p>
             {hasStudent ? (
               <div className="mt-2 flex flex-col gap-1">
                 <div>
-                  <p className="font-semibold text-sm leading-tight text-slate-900">{seat.student_one.name}</p>
-                  <p className="text-[11px] text-slate-600">{seat.student_one.roll_no}</p>
-                </div>
-                {examType === "MID" && seat.student_two && (
-                  <div>
-                    <p className="font-semibold text-sm leading-tight text-slate-900">{seat.student_two.name}</p>
-                    <p className="text-[11px] text-slate-600">{seat.student_two.roll_no}</p>
+                    <p className="font-semibold text-xs leading-tight text-slate-900">{seat.student_one.name}</p>
+                    <p className="text-[10px] text-slate-600">{seat.student_one.roll_no}</p>
                   </div>
-                )}
+                  {examType === "MID" && seat.student_two && (
+                    <div>
+                    <p className="font-semibold text-xs leading-tight text-slate-900">{seat.student_two.name}</p>
+                    <p className="text-[10px] text-slate-600">{seat.student_two.roll_no}</p>
+                    </div>
+                  )}
               </div>
             ) : (
               <p className="mt-4 text-slate-400">Empty</p>
@@ -84,3 +84,4 @@ export default function SeatGrid({ seats, examType }) {
     </div>
   );
 }
+
