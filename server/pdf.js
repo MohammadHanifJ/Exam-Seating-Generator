@@ -28,7 +28,7 @@ const COLS_MID = [
 ];
 
 function drawTableHeader(doc, y, columns) {
-  let x = doc.page.margins.left;
+  let x = doc.x || doc.page.margins.left;
   doc.fontSize(10).fillColor("#0b0f1a");
   columns.forEach((col) => {
     doc
@@ -44,7 +44,7 @@ function drawTableHeader(doc, y, columns) {
 }
 
 function drawTableRow(doc, y, columns, values) {
-  let x = doc.page.margins.left;
+  let x = doc.x || doc.page.margins.left;
   doc.font("Helvetica").fillColor("#0f172a");
   columns.forEach((col, idx) => {
     doc.rect(x, y, col.width, ROW_HEIGHT).strokeColor("#0f172a").lineWidth(0.5).stroke();
@@ -110,46 +110,102 @@ function renderHeader(doc) {
   return doc.page.margins.top;
 }
 
-function renderMeta(doc, { examType, roomNo, invigilators }, startY) {
+function renderMeta(
+  doc,
+  { examType, roomNo, invigilators, blockName, floorName, block_name, floor_name, yearText },
+  startY,
+  columns
+) {
+  const safeBlock = blockName || block_name || "Unknown Block";
+  const safeFloor = floorName || floor_name || "Ground Floor";
   doc.y = startY;
-  doc.font("Helvetica-Bold").fontSize(14).fillColor("#0f172a").text("Srinivasa Ramanujan Institute of Technology", {
-    align: "center"
-  });
-  doc.font("Helvetica").fontSize(10).text("AUTONOMOUS", { align: "center" });
-  doc.font("Helvetica-Bold").fontSize(11).text("SEATING PLAN", { align: "center" });
-  doc.moveDown(0.3);
   doc
     .lineWidth(1)
     .moveTo(doc.page.margins.left, doc.y)
     .lineTo(doc.page.width - doc.page.margins.right, doc.y)
     .stroke("#0f172a");
-  doc.moveDown(0.4);
-  doc.font("Helvetica-Bold").fontSize(10).fillColor("#0f172a");
-  doc.text(`Exam Type: ${examType}`);
-  doc.text(`Room No: ${roomNo}`);
-  if (invigilators?.length) {
-    const list = invigilators
-      .map((inv) => `${inv.name}${inv.designation ? ` (${inv.designation})` : ""} - ${inv.department}`)
-      .join("; ");
-    doc.font("Helvetica").text(`Invigilator(s): ${list}`);
-  }
-  doc.moveDown(0.6);
+  doc.moveDown(0.5);
+
+  // Render key details in a small table for clarity.
+  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const tableWidth = columns?.reduce((sum, col) => sum + col.width, 0) || pageWidth;
+  const tableX = doc.page.margins.left + Math.max(0, (pageWidth - tableWidth) / 2);
+  const tableY = doc.y;
+  const colLabel = 120;
+  const colValue = tableWidth - colLabel;
+  const rows = [
+    ["Exam Type", examType],
+    ["Year", yearText || "-"],
+    ["Block", safeBlock],
+    ["Floor", safeFloor],
+    ["Room No", roomNo],
+    [
+      "Invigilator(s)",
+      invigilators?.length
+        ? invigilators
+            .map((inv) => `${inv.name}${inv.designation ? ` (${inv.designation})` : ""} - ${inv.department}`)
+            .join("; ")
+        : "-"
+    ]
+  ];
+
+  doc.font("Helvetica-Bold").fontSize(11).fillColor("#0f172a");
+  rows.forEach((row, idx) => {
+    const y = tableY + idx * 18;
+    doc.rect(tableX, y, colLabel, 18).strokeColor("#0f172a").lineWidth(0.5).stroke();
+    doc.rect(tableX + colLabel, y, colValue, 18).strokeColor("#0f172a").lineWidth(0.5).stroke();
+    doc.text(row[0], tableX + 6, y + 4, { width: colLabel - 12, align: "left" });
+    doc.font("Helvetica").fontSize(11).text(row[1], tableX + colLabel + 6, y + 4, {
+      width: colValue - 12,
+      align: "left"
+    });
+    doc.font("Helvetica-Bold").fontSize(11);
+  });
+
+  doc.y = tableY + rows.length * 18 + 6;
 }
 
 function renderRoom(doc, payload) {
   const { examType, seats, capacity } = payload;
   const columns = examType === "MID" ? COLS_MID : COLS_SEMESTER;
   const headerStart = renderHeader(doc);
-  renderMeta(doc, payload, headerStart);
+  const yearPairs = (seats || [])
+    .flatMap((seat) => [
+      seat.student_one ? { branch: seat.student_one.branch, year: seat.student_one.year } : null,
+      seat.student_two ? { branch: seat.student_two.branch, year: seat.student_two.year } : null
+    ])
+    .filter(Boolean);
+  const years = Array.from(new Set(yearPairs.map((p) => p.year).filter(Boolean)));
+  let yearText = "-";
+  if (years.length === 1) {
+    yearText = `Year ${years[0]}`;
+  } else if (years.length > 1) {
+    const byBranch = {};
+    yearPairs.forEach(({ branch, year }) => {
+      if (!branch || !year) return;
+      if (!byBranch[branch]) byBranch[branch] = new Set();
+      byBranch[branch].add(year);
+    });
+    yearText = Object.entries(byBranch)
+      .map(([branch, set]) => `${branch}: ${Array.from(set).map((y) => `Year ${y}`).join(", ")}`)
+      .join("; ");
+  }
+  renderMeta(doc, { ...payload, yearText }, headerStart, columns);
+  const pageWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
+  const tableWidth = columns.reduce((sum, col) => sum + col.width, 0);
+  const tableX = doc.page.margins.left + Math.max(0, (pageWidth - tableWidth) / 2);
+  doc.x = tableX;
   let y = drawTableHeader(doc, doc.y, columns);
   doc.fontSize(9).fillColor("#0f172a");
   const rows = examType === "MID" ? buildMidRows(seats, capacity) : buildSemesterRows(seats, capacity);
   rows.forEach((row) => {
     y = ensureSpace(doc, y, columns, () => {
       const headerY = renderHeader(doc);
-      renderMeta(doc, payload, headerY);
+      renderMeta(doc, { ...payload, yearText }, headerY, columns);
+      doc.x = tableX;
       return doc.y;
     });
+    doc.x = tableX;
     y = drawTableRow(doc, y, columns, row);
   });
 }
@@ -180,6 +236,8 @@ export async function buildCombinedPdf({
     if (idx > 0) doc.addPage();
     renderRoom(doc, {
       roomNo: room.room_no,
+      block_name: room.block_name,
+      floor_name: room.floor_name,
       examType,
       seats: room.seats,
       capacity: room.capacity,

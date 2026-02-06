@@ -44,6 +44,10 @@ export async function addClassroom(room) {
   });
 }
 
+export async function deleteClassroom(roomNo) {
+  return request(`/classrooms/${encodeURIComponent(roomNo)}`, { method: "DELETE" });
+}
+
 export async function generateSeating(payload) {
   return request("/generate", {
     method: "POST",

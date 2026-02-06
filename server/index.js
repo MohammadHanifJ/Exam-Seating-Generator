@@ -286,17 +286,27 @@ app.get("/api/branches", requireAdmin, async (req, res) => {
 });
 
 app.get("/api/classrooms", requireAdmin, async (req, res) => {
-  const result = await query("SELECT room_no, capacity, active FROM classrooms WHERE active = TRUE ORDER BY room_no");
+  const result = await query(
+    "SELECT room_no, block_name, floor_name, capacity, active FROM classrooms WHERE active = TRUE ORDER BY room_no"
+  );
   res.json(result.rows);
 });
 
 app.post("/api/classrooms", requireAdmin, async (req, res) => {
-  const { room_no, capacity } = req.body;
-  if (!room_no) return res.status(400).json({ error: "room_no is required" });
+  const { room_no, capacity, block_name, floor_name } = req.body;
+  if (!room_no || !block_name) return res.status(400).json({ error: "room_no and block_name are required" });
+  const allowedFloors = ["Ground Floor", "First Floor", "Second Floor", "Third Floor"];
+  const safeFloor = allowedFloors.includes(floor_name) ? floor_name : "Ground Floor";
   await query(
-    "INSERT INTO classrooms (room_no, capacity) VALUES ($1, $2) ON CONFLICT (room_no) DO UPDATE SET capacity = EXCLUDED.capacity",
-    [room_no, capacity || 30]
+    "INSERT INTO classrooms (room_no, block_name, floor_name, capacity) VALUES ($1, $2, $3, $4) ON CONFLICT (room_no) DO UPDATE SET block_name = EXCLUDED.block_name, floor_name = EXCLUDED.floor_name, capacity = EXCLUDED.capacity",
+    [room_no, block_name ?? "Unknown Block", safeFloor, capacity || 30]
   );
+  res.json({ ok: true });
+});
+
+app.delete("/api/classrooms/:roomNo", requireAdmin, async (req, res) => {
+  const roomNo = req.params.roomNo;
+  await query("UPDATE classrooms SET active = FALSE WHERE room_no = $1", [roomNo]);
   res.json({ ok: true });
 });
 
@@ -312,7 +322,7 @@ app.post("/api/generate", requireAdmin, async (req, res) => {
   }
 
   const roomRows = await query(
-    "SELECT room_no, capacity FROM classrooms WHERE room_no = ANY($1::text[]) AND active = TRUE",
+    "SELECT room_no, block_name, floor_name, capacity FROM classrooms WHERE room_no = ANY($1::text[]) AND active = TRUE",
     [rooms]
   );
 
@@ -488,11 +498,16 @@ app.get("/api/seating/:batchId", requireAdmin, async (req, res) => {
 
   const roomNos = Array.from(new Set(rows.rows.map((row) => row.room_no)));
   const roomCaps = roomNos.length
-    ? await query("SELECT room_no, capacity FROM classrooms WHERE room_no = ANY($1::text[])", [roomNos])
+    ? await query("SELECT room_no, block_name, floor_name, capacity FROM classrooms WHERE room_no = ANY($1::text[])", [roomNos])
     : { rows: [] };
   const capacityByRoom = {};
+  const roomMetaByRoom = {};
   roomCaps.rows.forEach((row) => {
     capacityByRoom[row.room_no] = row.capacity || 30;
+    roomMetaByRoom[row.room_no] = {
+      block_name: row.block_name || "Unknown Block",
+      floor_name: row.floor_name || "Ground Floor"
+    };
   });
 
   const invRows = await query(
@@ -523,6 +538,8 @@ app.get("/api/seating/:batchId", requireAdmin, async (req, res) => {
         year: row.year,
         seats: [],
         capacity: capacityByRoom[row.room_no] || 30,
+        block_name: roomMetaByRoom[row.room_no]?.block_name || "Unknown Block",
+        floor_name: roomMetaByRoom[row.room_no]?.floor_name || "Ground Floor",
         invigilators: invByRoom[row.room_no] || []
       };
     }
@@ -629,11 +646,16 @@ app.get("/api/seating/:batchId/pdf", requireAdmin, async (req, res) => {
 
   const roomNos = Object.keys(grouped);
   const roomCaps = roomNos.length
-    ? await query("SELECT room_no, capacity FROM classrooms WHERE room_no = ANY($1::text[])", [roomNos])
+    ? await query("SELECT room_no, block_name, floor_name, capacity FROM classrooms WHERE room_no = ANY($1::text[])", [roomNos])
     : { rows: [] };
   const capacityByRoom = {};
+  const roomMetaByRoom = {};
   roomCaps.rows.forEach((row) => {
     capacityByRoom[row.room_no] = row.capacity || 30;
+    roomMetaByRoom[row.room_no] = {
+      block_name: row.block_name || "Unknown Block",
+      floor_name: row.floor_name || "Ground Floor"
+    };
   });
 
   let buffer;
@@ -655,6 +677,8 @@ app.get("/api/seating/:batchId/pdf", requireAdmin, async (req, res) => {
   if (roomNo) {
     buffer = await buildRoomPdf({
       roomNo,
+      blockName: roomMetaByRoom[roomNo]?.block_name || "Unknown Block",
+      floorName: roomMetaByRoom[roomNo]?.floor_name || "Ground Floor",
       examType,
       seats: grouped[roomNo],
       capacity: capacityByRoom[roomNo] || 30,
@@ -667,6 +691,8 @@ app.get("/api/seating/:batchId/pdf", requireAdmin, async (req, res) => {
       room_no: key,
       seats: grouped[key],
       capacity: capacityByRoom[key] || 30,
+      block_name: roomMetaByRoom[key]?.block_name || "Unknown Block",
+      floor_name: roomMetaByRoom[key]?.floor_name || "Ground Floor",
       invigilators: invByRoom[key] || []
     }));
     buffer = await buildCombinedPdf({
@@ -744,11 +770,16 @@ app.post("/api/seating/:batchId/email", requireAdmin, async (req, res) => {
 
   const roomNos = Object.keys(grouped);
   const roomCaps = roomNos.length
-    ? await query("SELECT room_no, capacity FROM classrooms WHERE room_no = ANY($1::text[])", [roomNos])
+    ? await query("SELECT room_no, block_name, floor_name, capacity FROM classrooms WHERE room_no = ANY($1::text[])", [roomNos])
     : { rows: [] };
   const capacityByRoom = {};
+  const roomMetaByRoom = {};
   roomCaps.rows.forEach((row) => {
     capacityByRoom[row.room_no] = row.capacity || 30;
+    roomMetaByRoom[row.room_no] = {
+      block_name: row.block_name || "Unknown Block",
+      floor_name: row.floor_name || "Ground Floor"
+    };
   });
   const countsByRoom = {};
   Object.keys(grouped).forEach((roomNoKey) => {
@@ -767,6 +798,8 @@ app.post("/api/seating/:batchId/email", requireAdmin, async (req, res) => {
     room_no: key,
     seats: grouped[key],
     capacity: capacityByRoom[key] || 30,
+    block_name: roomMetaByRoom[key]?.block_name || "Unknown Block",
+    floor_name: roomMetaByRoom[key]?.floor_name || "Ground Floor",
     invigilators: invByRoom[key] || []
   }));
 
@@ -803,3 +836,4 @@ startServer().catch((err) => {
   console.error("Startup failed:", err.message);
   process.exit(1);
 });
+

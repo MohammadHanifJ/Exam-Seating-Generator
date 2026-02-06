@@ -42,10 +42,18 @@ export async function initSchema() {
   await query(`
     CREATE TABLE IF NOT EXISTS classrooms (
       room_no TEXT PRIMARY KEY,
+      block_name TEXT NOT NULL DEFAULT 'Unknown Block',
+      floor_name TEXT NOT NULL DEFAULT 'Ground Floor',
       capacity INT NOT NULL DEFAULT 30,
       active BOOLEAN NOT NULL DEFAULT TRUE
     );
   `);
+
+  // Backward compatible: add block/floor if missing and set safe defaults.
+  await query(`ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS block_name TEXT NOT NULL DEFAULT 'Unknown Block';`);
+  await query(`ALTER TABLE classrooms ADD COLUMN IF NOT EXISTS floor_name TEXT NOT NULL DEFAULT 'Ground Floor';`);
+  await query(`UPDATE classrooms SET block_name = 'Unknown Block' WHERE block_name IS NULL;`);
+  await query(`UPDATE classrooms SET floor_name = 'Ground Floor' WHERE floor_name IS NULL;`);
 
   await query(`
     CREATE TABLE IF NOT EXISTS invigilators (

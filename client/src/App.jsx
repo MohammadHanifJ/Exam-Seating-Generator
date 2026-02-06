@@ -4,6 +4,7 @@ import Generate from "./pages/Generate.jsx";
 import Preview from "./pages/Preview.jsx";
 import AdminLayout from "./layouts/AdminLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import ReviewStudents from "./pages/ReviewStudents.jsx";
 
 export default function App() {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/upload" element={<UploadStudents />} />
+          <Route path="/review" element={<ReviewStudents />} />
           <Route path="/generate" element={<Generate onGenerated={onGenerated} />} />
           <Route path="/preview" element={<Preview />} />
         </Route>

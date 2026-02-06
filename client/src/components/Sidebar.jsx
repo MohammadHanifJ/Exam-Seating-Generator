@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 const items = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/upload", label: "Upload Students" },
+  { to: "/review", label: "Review Students" },
   { to: "/generate", label: "Generate Seating" },
   { to: "/preview", label: "Seating Preview" }
 ];
@@ -38,13 +39,7 @@ export default function Sidebar({ open, onClose, onLogout }) {
                 </NavLink>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={onLogout}
-              className="mt-6 w-full rounded-xl border border-orange-200 px-4 py-3 text-xs font-semibold text-orange-700 hover:bg-orange-50"
-            >
-              Logout
-            </button>
+            <div className="mt-6" />
           </nav>
         </div>
       </aside>
