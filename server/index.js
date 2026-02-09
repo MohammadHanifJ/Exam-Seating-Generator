@@ -811,13 +811,19 @@ app.post("/api/seating/:batchId/email", requireAdmin, async (req, res) => {
   });
 
   const mailer = createMailer();
-  await mailer.sendMail({
-    from: process.env.SMTP_FROM,
-    to: recipients.join(","),
-    subject: "Exam Seating Arrangement",
-    text: "Attached is the seating arrangement PDF.",
-    attachments: [{ filename: "seating.pdf", content: buffer }]
-  });
+
+  try {
+    await mailer.sendMail({
+      from: process.env.SMTP_FROM,
+      to: recipients.join(","),
+      subject: "Exam Seating Arrangement",
+      text: "Attached is the seating arrangement PDF.",
+      attachments: [{ filename: "seating.pdf", content: buffer }]
+    });
+  } catch (err) {
+    console.error("SMTP EMAIL FAILED:", err.message);
+    // Do NOT crash the server on SMTP failure
+  }
 
   res.json({ ok: true });
 });
