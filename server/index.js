@@ -17,14 +17,30 @@ import {
   countSeatsFilled
 } from "./seating.js";
 import { buildCombinedPdf, buildRoomPdf } from "./pdf.js";
-import { createMailer } from "./mail.js";
+import { sendEmail } from "./mail.js";
 
 const app = express();
 
 /* =========================
    BASIC MIDDLEWARE
 ========================= */
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://exam-seating-generator.netlify.app"
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("CORS blocked"), false);
+    },
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
 app.use(express.json());
 
 /* =========================
@@ -810,12 +826,9 @@ app.post("/api/seating/:batchId/email", requireAdmin, async (req, res) => {
     departments: []
   });
 
-  const mailer = createMailer();
-
   try {
-    await mailer.sendMail({
-      from: process.env.SMTP_FROM,
-      to: recipients.join(","),
+    await sendEmail({
+      to: recipients,
       subject: "Exam Seating Arrangement",
       text: "Attached is the seating arrangement PDF.",
       attachments: [{ filename: "seating.pdf", content: buffer }]
